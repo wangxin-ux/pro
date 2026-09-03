@@ -28,16 +28,16 @@ export default function PptDetail({ onClose, onCopy, copied, githubUrl }: Props)
       <img className="ppt-reference-media" src="/cases/deerflow-ppt-detail-cover-reference.png" alt="DeerFlow Agent 界面示例" />
       <div className="ppt-reference-wash" aria-hidden="true" />
       <button ref={closeButton} className="ppt-reference-close" onClick={onClose} aria-label="关闭详情"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg></button>
-      <h2 id="ppt-reference-title">PPT Generation</h2>
-      <p className="ppt-reference-description">DeerFlow 的演示文稿生成 Skill：按统一视觉风格逐页生成幻灯片图像，<br />并自动合成为专业 PPTX。</p>
-      <div className="ppt-reference-tags"><span>PPTX</span><span>AI 生图</span><span>统一风格</span><span>DeerFlow</span></div>
+      <h2 id="ppt-reference-title">PPT Master</h2>
+      <p className="ppt-reference-description">把 PDF、DOCX、网页或主题转为原生可编辑 PPTX，<br />保留文本、图表、形状、动画与演讲者备注。</p>
+      <div className="ppt-reference-tags"><span>PPTX</span><span>原生可编辑</span><span>AI 演示</span><span>PPT Master</span></div>
       <div className="ppt-reference-facts">
-        <div className="ppt-reference-author"><FactIcon kind="author" /><div><span>作者</span><p>ByteDance DeerFlow 团队</p></div></div>
+        <div className="ppt-reference-author"><FactIcon kind="author" /><div><span>作者</span><p>Hugo He</p></div></div>
         <div className="ppt-reference-github"><FactIcon kind="github" /><div><span>GitHub</span><a href={githubUrl} target="_blank" rel="noreferrer">查看开源项目 →</a></div></div>
-        <div className="ppt-reference-platform"><FactIcon kind="platform" /><div><span>适用平台</span><p>DeerFlow；可由 Codex、Claude Code、Cursor 等<br />编码 Agent 接入与调用</p></div></div>
+        <div className="ppt-reference-platform"><FactIcon kind="platform" /><div><span>适用平台</span><p>Codex、Claude Code、Cursor、VS Code + Copilot 等<br />具备 Agent 能力的工具可在本地运行与导出。</p></div></div>
       </div>
-      <div className="ppt-reference-case"><h3>从内容大纲到统一视觉的完整演示文稿</h3><p>可规划多页结构，选择版式与风格，暗黑高级、现代简洁、Keynote 等视觉方向；<br />每页会沿用前一页的视觉参考，使整套演示保持一致。</p></div>
-      <div className="ppt-reference-prompt"><h3>在 Codex 中这样说</h3><p>使用 PPT Generation，基于这份大纲生成 10 页 16:9 的商务风格 PPTX，<br />并保持整套视觉统一。</p><button onClick={onCopy}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1c1.5 7 4 9.5 11 11-7 1.5-9.5 4-11 11C10.5 16 8 13.5 1 12c7-1.5 9.5-4 11-11Z"/></svg>{copied ? "已复制 ✓" : "复制调用方式"}</button></div>
+      <div className="ppt-reference-case"><h3>从源材料到可继续编辑的原生演示文稿</h3><p>支持 PDF、DOCX、网页、Markdown 与主题输入，输出真实 PowerPoint 对象；<br />可复用模板，并按需添加图表、转场、动画与旁白。</p></div>
+      <div className="ppt-reference-prompt"><h3>在 Codex 中这样说</h3><p>使用 PPT Master，把 projects/report.pdf 转成 10 页 16:9 的<br />原生可编辑 PPTX，并沿用简洁商务风格。</p><button onClick={onCopy}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1c1.5 7 4 9.5 11 11-7 1.5-9.5 4-11 11C10.5 16 8 13.5 1 12c7-1.5 9.5-4 11-11Z"/></svg>{copied ? "已复制 ✓" : "复制调用方式"}</button></div>
     </section>
   </div>;
 }
