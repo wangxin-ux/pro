@@ -7,7 +7,7 @@ type Props = { onClose: () => void; onCopy: () => void; copied: boolean; githubU
 
 function FactIcon({ kind }: { kind: "author" | "github" | "platform" }) {
   return <span className="ppt-fact-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.65" strokeLinecap="round" strokeLinejoin="round">
-    {kind === "author" ? <><path d="M9 3.3a4 4 0 1 0 6 0M5 20v-2a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v2M8 20v-2h8v2M4 8a3 3 0 0 0 0 6M2 19v-1a4 4 0 0 1 3-3"/></> : kind === "platform" ? <><path d="m12 2-10 5 10 5 10-5-10-5ZM2 12l10 5 10-5M2 17l10 5 10-5"/></> : <path fill="currentColor" stroke="none" d="M12 .8a11.2 11.2 0 0 0-3.54 21.83c.56.1.77-.24.77-.54v-2.1c-3.13.68-3.79-1.33-3.79-1.33-.51-1.3-1.25-1.64-1.25-1.64-1.02-.7.08-.69.08-.69 1.13.08 1.73 1.16 1.73 1.16 1 1.72 2.62 1.22 3.26.93.1-.73.4-1.22.72-1.5-2.5-.28-5.13-1.25-5.13-5.56 0-1.23.44-2.23 1.16-3.02-.12-.29-.5-1.43.11-2.98 0 0 .94-.3 3.08 1.16a10.66 10.66 0 0 1 5.6 0c2.14-1.46 3.08-1.16 3.08-1.16.61 1.55.23 2.69.11 2.98.72.79 1.16 1.79 1.16 3.02 0 4.32-2.63 5.27-5.14 5.55.4.35.77 1.03.77 2.08v3.1c0 .3.2.65.78.54A11.2 11.2 0 0 0 12 .8Z"/>}
+    {kind === "author" ? <><path d="M11 3.5a3.8 3.8 0 1 0 4.9-.5M7.5 21v-2.3a3.6 3.6 0 0 1 3.6-3.6h4.3a3.6 3.6 0 0 1 3.6 3.6V21M10.8 21v-2h4.9M6 12.2a4 4 0 0 0-3 3.9M5.2 17.5A4.4 4.4 0 0 0 3.5 21"/></> : kind === "platform" ? <><path d="m12 2-10 5 10 5 10-5-10-5ZM2 12l10 5 10-5M2 17l10 5 10-5"/></> : <path fill="currentColor" stroke="none" d="M12 .8a11.2 11.2 0 0 0-3.54 21.83c.56.1.77-.24.77-.54v-2.1c-3.13.68-3.79-1.33-3.79-1.33-.51-1.3-1.25-1.64-1.25-1.64-1.02-.7.08-.69.08-.69 1.13.08 1.73 1.16 1.73 1.16 1 1.72 2.62 1.22 3.26.93.1-.73.4-1.22.72-1.5-2.5-.28-5.13-1.25-5.13-5.56 0-1.23.44-2.23 1.16-3.02-.12-.29-.5-1.43.11-2.98 0 0 .94-.3 3.08 1.16a10.66 10.66 0 0 1 5.6 0c2.14-1.46 3.08-1.16 3.08-1.16.61 1.55.23 2.69.11 2.98.72.79 1.16 1.79 1.16 3.02 0 4.32-2.63 5.27-5.14 5.55.4.35.77 1.03.77 2.08v3.1c0 .3.2.65.78.54A11.2 11.2 0 0 0 12 .8Z"/>}
   </svg></span>;
 }
 
@@ -18,7 +18,7 @@ export default function PptDetail({ onClose, onCopy, copied, githubUrl }: Props)
   useEffect(() => {
     const el = viewport.current;
     if (!el) return;
-    const observer = new ResizeObserver(([entry]) => setScale(Math.min(entry.contentRect.width / 1586, entry.contentRect.height / 992)));
+    const observer = new ResizeObserver(([entry]) => setScale(Math.min((entry.contentRect.width - 32) / 1586, (entry.contentRect.height - 32) / 992, 1)));
     observer.observe(el);
     closeButton.current?.focus({ preventScroll: true });
     return () => observer.disconnect();
