@@ -6,7 +6,7 @@ import "./ppt-detail.css";
 type Props = { onClose: () => void; onCopy: () => void; copied: boolean; githubUrl: string };
 
 const previewSlides = [
-  "/cases/ppt-master-preview-1.jpg", "/cases/ppt-master-preview-2.jpg", "/cases/ppt-master-preview-3.jpg", "/cases/ppt-master-preview-4.jpg", "/cases/ppt-master-preview-5.jpg",
+  "/cases/ppt-master-preview-a.png", "/cases/ppt-master-preview-b.png",
 ];
 
 function FactIcon({ kind }: { kind: "author" | "github" | "platform" }) {
@@ -19,8 +19,8 @@ export default function PptDetail({ onClose, onCopy, copied, githubUrl }: Props)
   const viewport = useRef<HTMLDivElement>(null);
   const closeButton = useRef<HTMLButtonElement>(null);
   const [scale, setScale] = useState(0);
-  const [slideIndex, setSlideIndex] = useState(-1);
-  const activeImage = slideIndex < 0 ? "/cases/ppt-master-bg.jpg" : previewSlides[slideIndex];
+  const [slideIndex, setSlideIndex] = useState(0);
+  const activeImage = previewSlides[slideIndex];
   useEffect(() => {
     const el = viewport.current; if (!el) return;
     const observer = new ResizeObserver(([entry]) => setScale(Math.min((entry.contentRect.width - 32) / 1586, (entry.contentRect.height - 32) / 992, 1)));
