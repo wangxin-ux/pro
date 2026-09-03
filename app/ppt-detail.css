@@ -1,0 +1,29 @@
+.ppt-reference-viewport{position:fixed;inset:0;z-index:1000;overflow:hidden;background:linear-gradient(90deg,#051827 0%,#0b2135 25%,#dbe8fa 49%,#f8fbff 55%,#f8fbff 100%);height:100dvh}
+.ppt-reference-stage{position:absolute;top:50%;left:50%;width:1586px;height:992px;overflow:hidden;transform-origin:center;background:radial-gradient(ellipse at 59% 49%,#eef4ff 0%,#f7faff 42%,#fbfdff 100%);font-family:Arial,"Microsoft YaHei","PingFang SC",sans-serif;color:#112e60;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+.ppt-reference-stage *{box-sizing:border-box}
+.ppt-reference-stage p,.ppt-reference-stage h2,.ppt-reference-stage h3{margin:0}
+.ppt-reference-stage .ppt-reference-media{position:absolute;inset:0 auto 0 0;width:795px;height:992px;max-width:none;object-fit:fill;mask-image:linear-gradient(90deg,#000 0%,#000 78%,transparent 100%);-webkit-mask-image:linear-gradient(90deg,#000 0%,#000 78%,transparent 100%);filter:none}
+.ppt-reference-wash{position:absolute;left:690px;top:-60px;width:290px;height:1120px;background:radial-gradient(ellipse at 10% 58%,#b5cff54d,transparent 70%);filter:blur(32px);pointer-events:none}
+.ppt-reference-close{position:absolute;left:1484px;top:39px;width:49px;height:49px;border:1px solid #dbe7fa;border-radius:50%;background:#f9fbff;box-shadow:0 2px 7px #2150a010;display:grid;place-items:center;padding:12px;color:#133b7f}
+.ppt-reference-close svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.ppt-reference-close:focus-visible,.ppt-reference-prompt button:focus-visible,.ppt-reference-github a:focus-visible{outline:3px solid #2376f4;outline-offset:5px}
+.ppt-reference-stage #ppt-reference-title{position:absolute;left:837px;top:94px;font:700 80px/1.14 Arial,sans-serif;letter-spacing:-.7px;color:#031839;white-space:nowrap}
+.ppt-reference-description{position:absolute;left:839px;top:198px;width:694px;font-size:20px;line-height:37px;font-weight:400;color:#244275;letter-spacing:-.3px}
+.ppt-reference-tags{position:absolute;left:839px;top:297px;display:flex;gap:20px;height:50px}
+.ppt-reference-tags span{display:grid;place-items:center;padding:0 26px;border-radius:23px;background:linear-gradient(145deg,#e3edfd,#e7effc);font-size:16px;color:#10367e;white-space:nowrap;box-shadow:0 3px 9px #bed0eb10}
+.ppt-reference-facts{position:absolute;left:825px;top:375px;width:700px;height:248px;border:1px solid #c4d8f7;border-bottom-color:#fff;border-right-color:#e5edf8;border-radius:32px;background:linear-gradient(120deg,#ffffffa6,#e2ecfc9c);box-shadow:0 12px 17px #306ec725,inset 0 1px 1px #fff;backdrop-filter:blur(16px)}
+.ppt-reference-author,.ppt-reference-github,.ppt-reference-platform{position:absolute;display:flex;gap:19px;align-items:flex-start}
+.ppt-reference-author{left:31px;top:41px}.ppt-reference-github{left:434px;top:41px;gap:18px}.ppt-reference-platform{left:31px;top:133px}
+.ppt-fact-icon{display:grid;place-items:center;width:53px;height:53px;flex:none;border-radius:50%;background:linear-gradient(145deg,#fff,#f1f6ff);box-shadow:0 5px 10px #7ca6df26;color:#163d83}
+.ppt-fact-icon svg{width:27px;height:27px}
+.ppt-reference-facts span:not(.ppt-fact-icon){display:block;font-size:16px;line-height:24px;color:#5473a0}
+.ppt-reference-facts p,.ppt-reference-facts a{display:block;margin-top:6px;font-size:17px;line-height:28px;font-weight:400;color:#17356d}
+.ppt-reference-facts a{color:#0069ff;text-decoration:none;font-weight:600;white-space:nowrap}
+.ppt-reference-case{position:absolute;left:839px;top:657px;width:690px}
+.ppt-reference-case h3{font-size:24px;line-height:34px;font-weight:500;color:#0b2252;letter-spacing:-.4px}
+.ppt-reference-case p{margin-top:9px;font-size:16px;line-height:31px;letter-spacing:-.2px;color:#486798}
+.ppt-reference-prompt{position:absolute;left:825px;top:780px;width:700px;height:178px;border:1px solid #caddf9;border-bottom-color:#e1eafa;border-radius:29px;background:#ffffffb8;box-shadow:0 6px 11px #476eac2b,inset 0 1px 0 #fff}
+.ppt-reference-prompt h3{position:absolute;left:32px;top:26px;color:#0769ff;font-size:27px;line-height:34px;font-weight:700}
+.ppt-reference-prompt p{position:absolute;left:32px;top:68px;font-size:15px;line-height:27px;letter-spacing:-.15px;color:#436493}
+.ppt-reference-prompt button{position:absolute;right:23px;bottom:19px;display:flex;align-items:center;justify-content:center;gap:9px;width:176px;height:52px;border:0;border-radius:28px;background:#0565ff;color:white;font-size:16px;white-space:nowrap}
+.ppt-reference-prompt button svg{width:20px;height:20px;fill:currentColor}

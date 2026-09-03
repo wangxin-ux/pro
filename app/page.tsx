@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import PptDetail from "./ppt-detail";
 
 type Media = { type: "image" | "video"; src: string; alt: string };
 type Resource = {
@@ -132,7 +133,7 @@ export default function Home() {
 
       <footer className="shell"><a className="brand" href="#top"><span className="brand-mark">益</span><span>益智集</span></a><p>让每个人都能享受到 AI 带来的便利。</p><span>© 2026 益智集 · 公益开放平台</span></footer>
 
-      {selected && <div className={`modal-backdrop ${selected.name === "PPT Generation" ? "ppt-generation-backdrop" : ""}`} role="presentation" onMouseDown={(e)=>{if(e.target===e.currentTarget)setSelected(null)}}><section className={`detail-modal ${selected.cover ? "has-cover" : ""} ${selected.name === "PPT Generation" ? "ppt-generation-detail" : ""}`} role="dialog" aria-modal="true" aria-label={`${selected.name}详情`}>
+      {selected?.name === "PPT Generation" ? <PptDetail onClose={() => setSelected(null)} onCopy={copyPrompt} copied={copied} githubUrl={selected.githubUrl!} /> : selected && <div className="modal-backdrop" role="presentation" onMouseDown={(e)=>{if(e.target===e.currentTarget)setSelected(null)}}><section className={`detail-modal ${selected.cover ? "has-cover" : ""}`} role="dialog" aria-modal="true" aria-label={`${selected.name}详情`}>
         <button className="modal-close" onClick={()=>setSelected(null)} aria-label="关闭">×</button>
         <div className="detail-media">
           {selected.cover ? <img className="detail-cover" src={selected.detailCover ?? selected.cover} alt={`${selected.name} 项目封面`}/> : currentMedia ? currentMedia.type === "image" ? <img src={currentMedia.src} alt={currentMedia.alt}/> : <video controls autoPlay muted playsInline><source src={currentMedia.src} type="video/mp4"/></video> : <div className="detail-placeholder" style={{background:selected.tint}}><span>{selected.icon}</span><p>{selected.category}</p></div>}
