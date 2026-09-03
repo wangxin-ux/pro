@@ -1,0 +1,16 @@
+/* Reference canvas 1287 × 1222. Sizes derive from card width, not viewport. */
+.resource-card.ppt-reference-card{position:relative;container-type:inline-size;aspect-ratio:1287/1222;align-self:start;border:0;border-radius:4.4%;overflow:hidden;background:linear-gradient(135deg,#fff 65%,#f2f6fd);box-shadow:inset 0 0 0 5px #e6effd;font-family:Arial,"Microsoft YaHei","PingFang SC",sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+.resource-card.ppt-reference-card:hover{transform:none}
+.resource-card.ppt-reference-card:focus-visible{outline:2px solid #176be5;outline-offset:3px}
+.resource-card.ppt-reference-card .card-visual{position:absolute;left:1.16%;top:1.15%;width:97.67%;height:56.5%;background:white;border-radius:3cqw 3cqw 0 0;overflow:hidden}
+.resource-card.ppt-reference-card .card-visual>img{width:100%;height:100%;object-fit:fill;object-position:center;mask-image:none;-webkit-mask-image:none;filter:none}
+.resource-card.ppt-reference-card .card-visual:after{content:"";position:absolute;inset:90% 0 0;background:linear-gradient(transparent,#fff)}
+.resource-card.ppt-reference-card .card-body{position:absolute;inset:0;padding:0;background:none;border:0;box-shadow:none;backdrop-filter:none}
+.resource-card.ppt-reference-card .type-row{position:absolute;left:5.98%;top:59%;gap:1.48cqw;margin:0;font:400 2.8cqw/1 Arial,"Microsoft YaHei",sans-serif}
+.resource-card.ppt-reference-card .type-row>span,.resource-card.ppt-reference-card .type-row>b,.resource-card.ppt-reference-card .type-row>em{display:grid;place-items:center;height:5.3cqw;padding:0 2.12cqw;border:1px solid #ffffff5c;border-radius:1.25cqw;font:inherit;font-style:normal;color:white;letter-spacing:0;box-shadow:inset 0 1px 1px #ffffff38}
+.resource-card.ppt-reference-card .type-row>span{background:#034acb}.resource-card.ppt-reference-card .type-row>b{background:#087535}.resource-card.ppt-reference-card .type-row>em{background:#f5a400}
+.resource-card.ppt-reference-card h3{position:absolute;left:5.98%;top:67.55%;margin:0;color:#061022;font:400 5.6cqw/1.2 Arial,sans-serif;letter-spacing:-.1cqw}
+.resource-card.ppt-reference-card p{position:absolute;left:5.98%;right:6%;top:76%;height:auto;overflow:visible;margin:0;color:#58647d;font:400 3.28cqw/1.6 Arial,"Microsoft YaHei","PingFang SC",sans-serif;letter-spacing:0}
+.resource-card.ppt-reference-card .card-bottom{position:absolute;left:5.98%;bottom:5.2%;padding:0;margin:0}
+.resource-card.ppt-reference-card .card-bottom>div{gap:2.8cqw;color:#72829d;font:400 2.9cqw/1.3 Arial,"Microsoft YaHei",sans-serif}
+.resource-card.ppt-reference-card .card-arrow{display:none}
