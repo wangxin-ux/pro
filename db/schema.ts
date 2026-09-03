@@ -5,6 +5,7 @@ export const communitySkills = sqliteTable("community_skills", {
   name: text("name").notNull(),
   author: text("author").notNull(),
   githubUrl: text("github_url").notNull(),
+  platform: text("platform").notNull().default(""),
   tagsJson: text("tags_json").notNull(),
   imagesJson: text("images_json").notNull(),
   feature: text("feature").notNull(),

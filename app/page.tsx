@@ -23,9 +23,10 @@ type Resource = {
   githubUrl?: string;
   cover?: string;
   detailCover?: string;
+  community?: boolean;
 };
 
-type CommunitySkill = { id:string; name:string; author:string; github_url:string; tags_json:string; images_json:string; feature:string; codex_prompt:string };
+type CommunitySkill = { id:string; name:string; author:string; github_url:string; platform:string; tags_json:string; images_json:string; feature:string; codex_prompt:string };
 
 const resources: Resource[] = [
   { name:"女娲造人", type:"Agent", description:"从人物或模糊需求出发，深度调研并蒸馏成可运行的思维顾问 Skill。", category:"研究与智能体", tags:["深度调研","Skill 生成","多智能体"], icon:"女", tint:"#eaf2ff", featured:true, media:[{type:"video",src:"/cases/nuwa-demo.mp4",alt:"女娲造人炼金术动画演示"},{type:"image",src:"/cases/nuwa-landing.png",alt:"女娲造人案例长图"},{type:"image",src:"/cases/nuwa-naval.png",alt:"Naval 思维 Skill 案例"},{type:"image",src:"/cases/nuwa-musk.png",alt:"Musk 思维 Skill 案例"}], caseTitle:"把一个人的思维方式变成可调用能力", caseSummary:"输入人物名后完成资料研究、心智模型提炼、表达方式适配和 Skill 文件生成，最后可直接在 Codex 中作为思维顾问使用。", prompt:"使用女娲造人，帮我蒸馏一个张一鸣视角的 Skill" },
@@ -62,6 +63,16 @@ const resources: Resource[] = [
 
 const filters = ["全部", "Skill", "Agent", "AI 应用", "有案例"] as const;
 
+const parseList = (value: string) => {
+  try { const parsed = JSON.parse(value); return Array.isArray(parsed) ? parsed.filter((item): item is string => typeof item === "string") : []; }
+  catch { return []; }
+};
+
+const asResource = (skill: CommunitySkill): Resource => {
+  const images = parseList(skill.images_json);
+  return { name:skill.name, type:"Skill", description:skill.feature, category:"公开 Skill", tags:parseList(skill.tags_json), icon:skill.name.slice(0, 2).toUpperCase(), tint:"#edf4ff", cover:images[0], media:images.map((src, index) => ({ type:"image" as const, src, alt:`${skill.name} ${index === 0 ? "封面" : `图片 ${index + 1}`}` })), caseTitle:"功能介绍", caseSummary:skill.feature, prompt:skill.codex_prompt, author:skill.author, platform:skill.platform || "暂未填写", githubUrl:skill.github_url, community:true };
+};
+
 export default function Home() {
   const [active, setActive] = useState<(typeof filters)[number]>("全部");
   const [query, setQuery] = useState("");
@@ -84,12 +95,12 @@ export default function Home() {
 
   const visible = useMemo(() => {
     const keyword = query.trim().toLowerCase();
-    return resources.filter((item) => {
+    return [...communitySkills.map(asResource), ...resources].filter((item) => {
       const inType = active === "全部" || (active === "有案例" ? Boolean(item.media?.length) : item.type === active);
       const text = `${item.name} ${item.type} ${item.category} ${item.description} ${item.tags.join(" ")}`.toLowerCase();
       return inType && (!keyword || text.includes(keyword));
     });
-  }, [active, query]);
+  }, [active, query, communitySkills]);
 
   const openResource = (item: Resource) => { setSelected(item); setMediaIndex(0); setCopied(false); };
   const currentMedia = selected?.media?.[mediaIndex];
@@ -105,15 +116,17 @@ export default function Home() {
     const form = event.currentTarget;
     const payload = new FormData(form);
     const tags = String(payload.get("tags") ?? "").split(/[,，]/).map((tag) => tag.trim()).filter(Boolean);
-    const imageCount = payload.getAll("images").filter((item) => item instanceof File && item.size > 0).length;
+    const cover = payload.get("cover");
+    const imageCount = payload.getAll("images").filter((item) => item instanceof File && item.size > 0).length + (cover instanceof File && cover.size > 0 ? 1 : 0);
     if (!tags.length || tags.length > 5) { setUploadNotice("请填写 1 至 5 个标签。 "); return; }
-    if (imageCount > 8) { setUploadNotice("图片最多可上传 8 张。 "); return; }
+    if (!(cover instanceof File) || !cover.size) { setUploadNotice("请先上传封面。 "); return; }
+    if (imageCount > 8) { setUploadNotice("封面和补充图片合计最多 8 张。 "); return; }
     payload.set("tags", JSON.stringify(tags)); setUploading(true); setUploadNotice("");
     try {
       const response = await fetch("/api/skills", { method:"POST", body:payload });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error ?? "提交失败，请稍后重试。");
-      setCommunitySkills((items) => [result, ...items]); form.reset(); setUploadNotice("已公开发布，所有访问者现在都能看到这个 Skill。 ");
+      setCommunitySkills((items) => [result, ...items]); form.reset(); setUploadNotice("已公开发布到主页资源库，所有访问者现在都能打开详情查看。 ");
     } catch (error) { setUploadNotice(error instanceof Error ? error.message : "提交失败，请稍后重试。"); }
     finally { setUploading(false); }
   };
@@ -132,7 +145,7 @@ export default function Home() {
           <h1>不只告诉你<br />有什么，<em>还展示怎么用。</em></h1>
           <p>把你本机已经安装的 Skill、Agent 和 AI 应用整理成可搜索的公益资源库。每个重点能力都有调用方式、真实案例、图片或视频。</p>
           <label className="hero-search"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="搜索本地 Skill、Agent、应用或用途..." aria-label="搜索本地资源" /><kbd>⌘ K</kbd></label>
-          <div className="hero-stats"><div><b>{resources.length}</b><span>首批去重资源</span></div><i/><div><b>{resources.filter(r=>r.media?.length).length}</b><span>条含案例媒体</span></div><i/><div><b>100%</b><span>本机已安装</span></div></div>
+          <div className="hero-stats"><div><b>{resources.length + communitySkills.length}</b><span>已收录资源</span></div><i/><div><b>{resources.filter(r=>r.media?.length).length + communitySkills.length}</b><span>条含案例媒体</span></div><i/><div><b>开放</b><span>支持公开上传</span></div></div>
         </div>
         <div className="hero-media" aria-label="案例媒体预览">
           <img src="/cases/nuwa-landing.png" alt="女娲造人案例" />
@@ -148,23 +161,19 @@ export default function Home() {
       </section>
 
       <section className="library" id="library"><div className="shell">
-        <div className="section-head"><div><span className="section-kicker">LOCAL LIBRARY</span><h2>本地 Codex 能力库</h2></div><p>已去除依赖副本与重复版本，先接入最常用、最有代表性的能力。</p></div>
-        <div className="toolbar"><div className="filters" role="group" aria-label="资源类型筛选">{filters.map(filter=><button key={filter} className={active===filter?"active":""} onClick={()=>setActive(filter)}>{filter}</button>)}</div><span className="result-count">显示 {visible.length} / {resources.length}</span></div>
-        {visible.length ? <div className="resource-grid">{visible.map(item=><div className={`resource-card ${item.cover ? "has-cover" : ""} ${item.name === "PPT Master" ? "ppt-reference-card" : ""}`} key={item.name} role="button" aria-label={`查看${item.name}案例`} onClick={()=>openResource(item)} tabIndex={0} onKeyDown={(event)=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();openResource(item)}}}>
+        <div className="section-head"><div><span className="section-kicker">SKILL LIBRARY</span><h2>Codex 能力库</h2></div><p>官方收录与公开上传统一展示；每一张卡片都可以打开查看详情与调用方式。</p></div>
+        <div className="toolbar"><div className="filters" role="group" aria-label="资源类型筛选">{filters.map(filter=><button key={filter} className={active===filter?"active":""} onClick={()=>setActive(filter)}>{filter}</button>)}</div><span className="result-count">显示 {visible.length} / {resources.length + communitySkills.length}</span></div>
+        {visible.length ? <div className="resource-grid">{visible.map((item, index)=><div className={`resource-card ${item.cover ? "has-cover" : ""} ${item.name === "PPT Master" && !item.community ? "ppt-reference-card" : ""}`} key={item.community ? `community-${index}-${item.name}` : `${item.name}-${index}`} role="button" aria-label={`查看${item.name}案例`} onClick={()=>openResource(item)} tabIndex={0} onKeyDown={(event)=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();openResource(item)}}}>
           <div className="card-visual">{item.cover ? <img src={item.cover} alt={`${item.name} 项目封面`} /> : item.media?.[0]?.type === "image" ? <img src={item.media[0].src} alt="" /> : item.media?.[0]?.type === "video" ? <video muted playsInline preload="metadata"><source src={item.media[0].src} type="video/mp4" /></video> : <div className="letter-cover" style={{background:item.tint}}><span>{item.icon}</span><i>{item.category}</i></div>}{item.media?.length ? <b className="media-count">{item.media.some(m=>m.type==="video")?"▶ ":"▧ "}{item.media.length} 个媒体</b> : null}</div>
-          <div className="card-body"><div className="type-row"><span>{item.type}</span><b>本机已安装</b>{item.featured&&<em>精选</em>}</div><h3>{item.name}</h3><p>{item.description}</p><div className="card-bottom"><div>{item.tags.slice(0,2).map(tag=><span key={tag}>#{tag}</span>)}</div><span className="card-arrow" aria-hidden="true">↗</span></div></div>
+          <div className="card-body"><div className="type-row"><span>{item.type}</span><b>{item.community ? "公开发布" : "本机已安装"}</b>{item.featured&&<em>精选</em>}</div><h3>{item.name}</h3><p>{item.description}</p><div className="card-bottom"><div>{item.tags.slice(0,2).map(tag=><span key={tag}>#{tag}</span>)}</div><span className="card-arrow" aria-hidden="true">↗</span></div></div>
         </div>)}</div> : <div className="empty"><span>⌕</span><h3>暂时没找到</h3><p>换个关键词，或选择其他分类试试。</p></div>}
       </div></section>
-
-      <section className="community shell" id="community"><div className="community-head"><div><span className="section-kicker">COMMUNITY SKILLS</span><h2>社区新上传</h2><p>由用户公开提交，所有访问者均可浏览与调用。</p></div><button onClick={() => { setUploadOpen(true); setUploadNotice(""); }}>上传我的 Skill <span>↗</span></button></div>
-        {communitySkills.length ? <div className="community-grid">{communitySkills.map((skill) => { const tags = JSON.parse(skill.tags_json) as string[]; const images = JSON.parse(skill.images_json) as string[]; return <article className="community-card" key={skill.id}>{images[0] ? <img src={images[0]} alt={`${skill.name} 上传图片`} /> : <div className="community-empty-image">SKILL</div>}<div><span>COMMUNITY SKILL</span><h3>{skill.name}</h3><p>{skill.feature}</p><div className="community-tags">{tags.map((tag) => <b key={tag}>#{tag}</b>)}</div><small>作者 · {skill.author}</small></div></article>; })}</div> : <div className="community-empty"><b>还没有社区上传的 Skill</b><span>第一个公开分享者可以从这里开始。</span></div>}
-      </section>
 
       <section className="principles shell" id="principles"><div><span className="section-kicker">HOW WE CURATE</span><h2>不是文件列表，<br />而是能看懂的能力地图。</h2></div><div className="principle-list"><article><span>01</span><h3>真实安装状态</h3><p>只标记这台 Codex 中实际存在的 Skill、Agent 和应用。</p></article><article><span>02</span><h3>案例优先</h3><p>优先复用本地真实成果、截图和视频，不用空洞的装饰图代替案例。</p></article><article><span>03</span><h3>可直接调用</h3><p>每个详情页都提供一句可复制的 Codex 调用方式。</p></article></div></section>
 
       <footer className="shell"><a className="brand" href="#top"><span className="brand-mark">益</span><span>益智集</span></a><p>让每个人都能享受到 AI 带来的便利。</p><span>© 2026 益智集 · 公益开放平台</span></footer>
 
-      {selected?.name === "PPT Master" ? <PptDetail onClose={() => setSelected(null)} onCopy={copyPrompt} copied={copied} githubUrl={selected.githubUrl!} /> : selected && <div className="modal-backdrop" role="presentation" onMouseDown={(e)=>{if(e.target===e.currentTarget)setSelected(null)}}><section className={`detail-modal ${selected.cover ? "has-cover" : ""}`} role="dialog" aria-modal="true" aria-label={`${selected.name}详情`}>
+      {selected?.name === "PPT Master" && !selected.community ? <PptDetail onClose={() => setSelected(null)} onCopy={copyPrompt} copied={copied} githubUrl={selected.githubUrl!} /> : selected && <div className="modal-backdrop" role="presentation" onMouseDown={(e)=>{if(e.target===e.currentTarget)setSelected(null)}}><section className={`detail-modal ${selected.cover ? "has-cover" : ""}`} role="dialog" aria-modal="true" aria-label={`${selected.name}详情`}>
         <button className="modal-close" onClick={()=>setSelected(null)} aria-label="关闭">×</button>
         <div className="detail-media">
           {selected.cover ? <img className="detail-cover" src={selected.detailCover ?? selected.cover} alt={`${selected.name} 项目封面`}/> : currentMedia ? currentMedia.type === "image" ? <img src={currentMedia.src} alt={currentMedia.alt}/> : <video controls autoPlay muted playsInline><source src={currentMedia.src} type="video/mp4"/></video> : <div className="detail-placeholder" style={{background:selected.tint}}><span>{selected.icon}</span><p>{selected.category}</p></div>}
@@ -172,7 +181,7 @@ export default function Home() {
         </div>
         <div className="detail-content">{selected.name === "PPT Generation" ? <><h2>{selected.name}</h2><p className="detail-desc">{selected.description}</p><div className="detail-tags">{selected.tags.map(tag=><span key={tag}>{tag}</span>)}</div><div className="ppt-resource-facts"><div className="fact-author"><i>♧</i><p><small>作者</small>{selected.author}</p></div><div className="fact-github"><i>●</i><p><small>GitHub</small><a href={selected.githubUrl} target="_blank" rel="noreferrer">查看开源项目 →</a></p></div><div className="fact-platform"><i>◇</i><p><small>适用平台</small>{selected.platform}</p></div></div><div className="case-note"><h3>{selected.caseTitle}</h3><p>{selected.caseSummary}</p></div><div className="prompt-box"><small>在 Codex 中这样说</small><code>{selected.prompt}</code><button onClick={copyPrompt}>{copied?"已复制 ✓":"✦ 复制调用方式"}</button></div></> : <><div className="detail-meta"><span>{selected.type}</span><b>● 资源详情</b></div><h2>{selected.name}</h2><p className="detail-desc">{selected.description}</p><div className="detail-tags">{selected.tags.map(tag=><span key={tag}>#{tag}</span>)}</div>{selected.author && <div className="resource-facts"><p><span>作者</span>{selected.author}</p><p><span>适用平台</span>{selected.platform}</p><p><span>GitHub</span><a href={selected.githubUrl} target="_blank" rel="noreferrer">查看开源项目 ↗</a></p></div>}<div className="case-note"><small>CASE STUDY</small><h3>{selected.caseTitle}</h3><p>{selected.caseSummary}</p></div><div className="prompt-box"><small>在 Codex 中这样说</small><code>{selected.prompt}</code><button onClick={copyPrompt}>{copied?"已复制 ✓":"复制调用方式"}</button></div></>}</div>
       </section></div>}
-      {uploadOpen && <div className="upload-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setUploadOpen(false); }}><section className="upload-dialog" role="dialog" aria-modal="true" aria-label="上传 Skill"><button className="upload-close" onClick={() => setUploadOpen(false)} aria-label="关闭">×</button><span className="section-kicker">PUBLISH TO COMMUNITY</span><h2>上传一个 Skill</h2><p>提交后将公开展示给所有访问者。标签最多 5 个，图片最多 8 张。</p><form onSubmit={submitSkill}><label>Skill 名称<input name="name" maxLength={80} required placeholder="例如：演示文稿大师" /></label><label>作者<input name="author" maxLength={80} required placeholder="作者或团队名称" /></label><label>GitHub 地址<input name="githubUrl" type="url" required placeholder="https://github.com/owner/repo" /></label><label>标签 <small>用逗号分隔，最多 5 个</small><input name="tags" required placeholder="PPTX, 设计, 自动化" /></label><label>功能介绍<textarea name="feature" required maxLength={1200} placeholder="说明这个 Skill 可以解决什么问题…" /></label><label>在 Codex 中怎么引用<textarea name="codexPrompt" required maxLength={800} placeholder="使用这个 Skill，帮我…" /></label><label>图片 <small>最多 8 张，每张不超过 8MB</small><input name="images" type="file" accept="image/*" multiple /></label>{uploadNotice && <p className="upload-notice">{uploadNotice}</p>}<button className="upload-submit" type="submit" disabled={uploading}>{uploading ? "正在公开发布…" : "公开发布 Skill →"}</button></form></section></div>}
+      {uploadOpen && <div className="upload-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setUploadOpen(false); }}><section className="upload-dialog" role="dialog" aria-modal="true" aria-label="上传 Skill"><button className="upload-close" onClick={() => setUploadOpen(false)} aria-label="关闭">×</button><span className="section-kicker">PUBLISH A SKILL</span><h2>上传一个 Skill</h2><p>公开后会直接进入主页能力库，并和已有 Skill 一样支持打开详情。封面必填；标签最多 5 个，图片（含封面）最多 8 张。</p><form onSubmit={submitSkill}><label>封面 <small>将作为主页卡片的首图，每张不超过 8MB</small><input name="cover" type="file" accept="image/*" required /></label><label>Skill 名称<input name="name" maxLength={80} required placeholder="例如：演示文稿大师" /></label><label>作者<input name="author" maxLength={80} required placeholder="作者或团队名称" /></label><label>GitHub 地址<input name="githubUrl" type="url" required placeholder="https://github.com/owner/repo" /></label><label>适用平台<input name="platform" required maxLength={500} placeholder="例如：Codex、Claude Code、Cursor" /></label><label>标签 <small>用逗号分隔，最多 5 个</small><input name="tags" required placeholder="PPTX, 设计, 自动化" /></label><label>功能介绍<textarea name="feature" required maxLength={1200} placeholder="说明这个 Skill 可以解决什么问题…" /></label><label>在 Codex 中怎么引用<textarea name="codexPrompt" required maxLength={800} placeholder="使用这个 Skill，帮我…" /></label><label>补充图片 <small>可再上传 0–7 张；与封面合计最多 8 张</small><input name="images" type="file" accept="image/*" multiple /></label>{uploadNotice && <p className="upload-notice">{uploadNotice}</p>}<button className="upload-submit" type="submit" disabled={uploading}>{uploading ? "正在公开发布…" : "公开发布 Skill →"}</button></form></section></div>}
     </main>
   );
 }

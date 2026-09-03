@@ -32,7 +32,7 @@ const worker = {
 
     if (url.pathname === "/api/skills") {
       if (request.method === "GET") {
-        const { results } = await env.DB.prepare("SELECT id, name, author, github_url, tags_json, images_json, feature, codex_prompt, created_at FROM community_skills ORDER BY created_at DESC").all();
+        const { results } = await env.DB.prepare("SELECT id, name, author, github_url, platform, tags_json, images_json, feature, codex_prompt, created_at FROM community_skills ORDER BY created_at DESC").all();
         return Response.json(results);
       }
       if (request.method === "POST") {
@@ -40,13 +40,16 @@ const worker = {
         const name = String(form.get("name") ?? "").trim().slice(0, 80);
         const author = String(form.get("author") ?? "").trim().slice(0, 80);
         const githubUrl = String(form.get("githubUrl") ?? "").trim().slice(0, 300);
+        const platform = String(form.get("platform") ?? "").trim().slice(0, 500);
         const feature = String(form.get("feature") ?? "").trim().slice(0, 1200);
         const codexPrompt = String(form.get("codexPrompt") ?? "").trim().slice(0, 800);
         let tags: string[] = [];
         try { tags = JSON.parse(String(form.get("tags") ?? "[]")); } catch { /* validation below */ }
         tags = Array.isArray(tags) ? tags.map((tag) => String(tag).trim()).filter(Boolean).slice(0, 5) : [];
-        const images = form.getAll("images").filter((item): item is File => item instanceof File && item.size > 0).slice(0, 8);
-        if (!name || !author || !githubUrl || !feature || !codexPrompt || !tags.length || images.length > 8) return Response.json({ error: "请完整填写信息，并添加 1–5 个标签与至多 8 张图片。" }, { status: 400 });
+        const cover = form.get("cover");
+        const detailImages = form.getAll("images").filter((item): item is File => item instanceof File && item.size > 0).slice(0, 7);
+        const images = [cover, ...detailImages].filter((item): item is File => item instanceof File && item.size > 0);
+        if (!name || !author || !githubUrl || !platform || !feature || !codexPrompt || !tags.length || !images.length || images.length > 8) return Response.json({ error: "请完整填写信息：封面、适用平台、1–5 个标签及最多 8 张图片均需符合要求。" }, { status: 400 });
         try { new URL(githubUrl); } catch { return Response.json({ error: "请填写有效的 GitHub 地址。" }, { status: 400 }); }
         if (images.some((image) => !image.type.startsWith("image/") || image.size > 8 * 1024 * 1024)) return Response.json({ error: "仅支持单张不超过 8MB 的图片。" }, { status: 400 });
         const id = crypto.randomUUID();
@@ -57,8 +60,8 @@ const worker = {
           return `/api/uploads/${key}`;
         }));
         const createdAt = Math.floor(Date.now() / 1000);
-        await env.DB.prepare("INSERT INTO community_skills (id, name, author, github_url, tags_json, images_json, feature, codex_prompt, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)").bind(id, name, author, githubUrl, JSON.stringify(tags), JSON.stringify(imageUrls), feature, codexPrompt, createdAt).run();
-        return Response.json({ id, name, author, github_url: githubUrl, tags_json: JSON.stringify(tags), images_json: JSON.stringify(imageUrls), feature, codex_prompt: codexPrompt, created_at: createdAt }, { status: 201 });
+        await env.DB.prepare("INSERT INTO community_skills (id, name, author, github_url, platform, tags_json, images_json, feature, codex_prompt, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)").bind(id, name, author, githubUrl, platform, JSON.stringify(tags), JSON.stringify(imageUrls), feature, codexPrompt, createdAt).run();
+        return Response.json({ id, name, author, github_url: githubUrl, platform, tags_json: JSON.stringify(tags), images_json: JSON.stringify(imageUrls), feature, codex_prompt: codexPrompt, created_at: createdAt }, { status: 201 });
       }
       return new Response("Method Not Allowed", { status: 405 });
     }
