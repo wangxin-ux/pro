@@ -1,0 +1,28 @@
+[Unit]
+Description=Yizhiji API and admin gateway
+After=network-online.target yizhiji-web.service
+Wants=network-online.target
+Requires=yizhiji-web.service
+
+[Service]
+Type=simple
+User=yizhiji
+Group=yizhiji
+WorkingDirectory=/srv/yizhiji/current
+EnvironmentFile=/etc/yizhiji.env
+Environment=NODE_ENV=production
+Environment=HOST=127.0.0.1
+Environment=PORT=3000
+Environment=VINEXT_UPSTREAM=http://127.0.0.1:3001
+Environment=DATA_DIR=/srv/yizhiji/data
+ExecStart=/usr/bin/node /srv/yizhiji/current/selfhost/server.mjs
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+ReadWritePaths=/srv/yizhiji/data
+
+[Install]
+WantedBy=multi-user.target

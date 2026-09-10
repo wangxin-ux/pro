@@ -1,0 +1,1 @@
+ALTER TABLE `community_skills` ADD `platform` text DEFAULT '' NOT NULL;

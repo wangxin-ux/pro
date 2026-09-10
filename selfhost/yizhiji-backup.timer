@@ -1,0 +1,10 @@
+[Unit]
+Description=Daily Yizhiji data backup
+
+[Timer]
+OnCalendar=*-*-* 03:17:00 UTC
+Persistent=true
+Unit=yizhiji-backup.service
+
+[Install]
+WantedBy=timers.target
