@@ -1,0 +1,23 @@
+[Unit]
+Description=Yizhiji Vinext web server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=yizhiji
+Group=yizhiji
+WorkingDirectory=/srv/yizhiji/current
+Environment=NODE_ENV=production
+Environment=HOST=127.0.0.1
+Environment=PORT=3001
+ExecStart=/usr/bin/node /srv/yizhiji/current/dist/standalone/server.js
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target
